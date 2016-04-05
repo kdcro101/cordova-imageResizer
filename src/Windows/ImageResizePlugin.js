@@ -23,64 +23,55 @@
 /*global Windows:true, URL:true, module:true, require:true, WinJS:true */
 
 
-(function() {
-    "use strict";
+var IMAGE_DATA_TYPE_BASE64 = "base64Image";
+var IMAGE_DATA_TYPE_URL = "urlImage";
+var RESIZE_TYPE_FACTOR = "factorResize";
+var RESIZE_TYPE_MIN_PIXEL = "minPixelResize";
+var RESIZE_TYPE_MAX_PIXEL = "maxPixelResize";
+var RETURN_BASE64 = "returnBase64";
+var RETURN_URI = "returnUri";
+var FORMAT_JPG = "jpg";
+var FORMAT_PNG = "png";
+var DEFAULT_FORMAT = "jpg";
+var DEFAULT_IMAGE_DATA_TYPE = ImageResizePlugin.IMAGE_DATA_TYPE_BASE64;
+var DEFAULT_RESIZE_TYPE = ImageResizePlugin.RESIZE_TYPE_FACTOR;
 
-    WinJS.Namespace.define("ImageResizePlugin", {
-        IMAGE_DATA_TYPE_BASE64: "base64Image",
-        IMAGE_DATA_TYPE_URL: "urlImage",
-        RESIZE_TYPE_FACTOR: "factorResize",
-        RESIZE_TYPE_MIN_PIXEL: "minPixelResize",
-        RESIZE_TYPE_MAX_PIXEL: "maxPixelResize",
-        RETURN_BASE64: "returnBase64",
-        RETURN_URI: "returnUri",
-        FORMAT_JPG: "jpg",
-        FORMAT_PNG: "png",
-        DEFAULT_FORMAT: "jpg"
-    });
-    WinJS.Namespace.define("ImageResizePlugin", {
-        DEFAULT_IMAGE_DATA_TYPE: ImageResizePlugin.IMAGE_DATA_TYPE_BASE64,
-        DEFAULT_RESIZE_TYPE: ImageResizePlugin.RESIZE_TYPE_FACTOR
-    });
-    WinJS.Namespace.define("ImageResizePlugin", {
-        ImageTools: WinJS.Class.define(
-            // Define the constructor function for the ColorsClass.
-            function ImageTools(args) {
-                this._imageData = args["data"];
-                this._imageDataType = args["imageDataType"];
-                if (!this._imageDataType) {
-                    this._imageDataType = ImageResizePlugin.DEFAULT_IMAGE_DATA_TYPE;
-                }
-                this._format = args["format"];
-                if (!this._format) {
-                    this._format = ImageResizePlugin.DEFAULT_FORMAT;
-                }
-            }, {
-                imageData: {
-                    get: function() {
-                        return this._imageData;
-                    }
-                },
-                imageDataType: {
-                    get: function() {
-                        return this._imageDataType;
-                    }
-                },
-                format: {
-                    get: function() {
-                        return this._format;
-                    }  
-                },
-                resizeImage: function (successCallback, errorCallback) {
-                },
-                imageSize: function (successCallback, errorCallback) {
-                },
-                storeImage: function (successCallback, errorCallback) {
-                }
+var ImageTools = WinJS.Class.define(
+    // Define the constructor function for the ColorsClass.
+    function ImageTools(args) {
+        this._imageData = args["data"];
+        this._imageDataType = args["imageDataType"];
+        if (!this._imageDataType) {
+            this._imageDataType = DEFAULT_IMAGE_DATA_TYPE;
+        }
+        this._format = args["format"];
+        if (!this._format) {
+            this._format = DEFAULT_FORMAT;
+        }
+    }, {
+        imageData: {
+            get: function() {
+                return this._imageData;
             }
-        )
-    });
-})();
+        },
+        imageDataType: {
+            get: function() {
+                return this._imageDataType;
+            }
+        },
+        format: {
+            get: function() {
+                return this._format;
+            }
+        },
+        resizeImage: function(successCallback, errorCallback) {
+        },
+        imageSize: function(successCallback, errorCallback) {
+        },
+        storeImage: function(successCallback, errorCallback) {
+        }
+    }
+);
 
 module.exports = {
     resizeImage: function (successCallback, errorCallback, args) {
