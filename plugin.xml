@@ -48,4 +48,24 @@
 
 		<source-file src="src/Android/com/raananw/ImageResizer/ImageResizePlugin.java" target-dir="src/com/raananws" />
 	</platform>
+
+	<!-- windows8 -->
+	<platform name="windows8">
+		<config-file target="package.appxmanifest" parent="/Package/Capabilities">
+			<Capability Name="picturesLibrary" />
+		</config-file>
+		<js-module src="src/windows/ImageResizePlugin.js" name="ImageResizePlugin">
+			<merges target="" />
+		</js-module>
+	</platform>
+
+	<!-- windows -->
+	<platform name="windows">
+		<config-file target="package.appxmanifest" parent="/Package/Capabilities">
+			<Capability Name="picturesLibrary" />
+		</config-file>
+		<js-module src="src/windows/ImageResizePlugin.js" name="ImageResizePlugin">
+			<merges target="" />
+		</js-module>
+	</platform>
 </plugin>
