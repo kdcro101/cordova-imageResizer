@@ -35,6 +35,8 @@ import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.util.DisplayMetrics;
+import android.net.Uri;
+import android.media.ExifInterface;
 
 public class ImageResizePlugin extends CordovaPlugin {
     public static final String IMAGE_DATA_TYPE_BASE64 = "base64Image";
@@ -105,14 +107,25 @@ public class ImageResizePlugin extends CordovaPlugin {
             return bmp;
         }
         
+        private String getTempDirectoryPath() {
+            // Use internal storage
+            File cache = cordova.getActivity().getCacheDir();
+            return cache.getAbsolutePath();
+        }
+        
         protected void storeImage(JSONObject params, String format, Bitmap bmp, CallbackContext callbackContext) throws JSONException, IOException, URISyntaxException {
             int quality = params.getInt("quality");
             String filename = params.getString("filename");
-            URI folderUri = new URI(params.getString("directory"));
-            URI pictureUri = new URI(params.getString("directory") + "/" + filename);
-            File folder = new File(folderUri);
+            String directory = params.getString("directory");
+            File folder;
+            if (directory != null && !directory.isEmpty()) {
+                URI folderUri = new URI(directory);
+                folder = new File(folderUri);
+            } else {
+                folder = new File(getTempDirectoryPath());
+            }
             folder.mkdirs();
-            File file = new File(pictureUri);
+            File file = new File(folder, filename);
             OutputStream outStream = new FileOutputStream(file);
             if (format.equals(FORMAT_PNG)) {
                 bmp.compress(Bitmap.CompressFormat.PNG, quality,
@@ -124,7 +137,7 @@ public class ImageResizePlugin extends CordovaPlugin {
             outStream.flush();
             outStream.close();
             JSONObject res = new JSONObject();
-            res.put("filename", filename);
+            res.put("filename", Uri.fromFile(file).toString());            
             res.put("width", bmp.getWidth());
             res.put("height", bmp.getHeight());
             callbackContext.success(res);
@@ -208,7 +221,19 @@ public class ImageResizePlugin extends CordovaPlugin {
                 }
                 
                 sizes = calculateFactors(params, options.outWidth, options.outHeight);
-                bmp = getResizedBitmap(bmp, sizes[0], sizes[1]);
+                File imageFile = null;
+                int orientation = ExifInterface.ORIENTATION_NORMAL;
+                URI uri = new URI(imageData);
+                if (uri) {
+                    imageFile = new File(uri);
+                    if (imageFile) {
+                        ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+                        if (exif) {
+                            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                        }
+                    }
+                }
+                bmp = getResizedBitmap(bmp, sizes[0], sizes[1], orientation);
                         
                 if (params.getBoolean("storeImage")) {
                     storeImage(params, format, bmp, callbackContext);
@@ -241,16 +266,28 @@ public class ImageResizePlugin extends CordovaPlugin {
             }
         }
         
-        private Bitmap getResizedBitmap(Bitmap bm, float widthFactor, float heightFactor) {
+        private Bitmap getResizedBitmap(Bitmap bm, float widthFactor, float heightFactor, int orientation) {
             int width = bm.getWidth();
             int height = bm.getHeight();
+            int rotate = 0;
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
             // create a matrix for the manipulation
             Matrix matrix = new Matrix();
             // resize the bit map
             matrix.postScale(widthFactor, heightFactor);
+            matrix.postRotate(rotate);
             // recreate the new Bitmap
-            Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
-                    matrix, false);
+            Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
             return resizedBitmap;
         }
         
