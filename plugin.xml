@@ -54,7 +54,7 @@
 		<config-file target="package.appxmanifest" parent="/Package/Capabilities">
 			<Capability Name="picturesLibrary" />
 		</config-file>
-		<js-module src="src/windows/ImageResizePlugin.js" name="ImageResizePlugin">
+		<js-module src="src/windows/ImageResizeProxy.js" name="ImageResizeProxy">
 			<merges target="" />
 		</js-module>
 	</platform>
@@ -64,7 +64,7 @@
 		<config-file target="package.appxmanifest" parent="/Package/Capabilities">
 			<Capability Name="picturesLibrary" />
 		</config-file>
-		<js-module src="src/windows/ImageResizePlugin.js" name="ImageResizePlugin">
+		<js-module src="src/windows/ImageResizeProxy.js" name="ImageResizeProxy">
 			<merges target="" />
 		</js-module>
 	</platform>

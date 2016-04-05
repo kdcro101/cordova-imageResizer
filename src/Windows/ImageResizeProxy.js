@@ -33,8 +33,8 @@ var RETURN_URI = "returnUri";
 var FORMAT_JPG = "jpg";
 var FORMAT_PNG = "png";
 var DEFAULT_FORMAT = "jpg";
-var DEFAULT_IMAGE_DATA_TYPE = ImageResizePlugin.IMAGE_DATA_TYPE_BASE64;
-var DEFAULT_RESIZE_TYPE = ImageResizePlugin.RESIZE_TYPE_FACTOR;
+var DEFAULT_IMAGE_DATA_TYPE = IMAGE_DATA_TYPE_BASE64;
+var DEFAULT_RESIZE_TYPE = RESIZE_TYPE_FACTOR;
 
 var ImageTools = WinJS.Class.define(
     // Define the constructor function for the ColorsClass.
