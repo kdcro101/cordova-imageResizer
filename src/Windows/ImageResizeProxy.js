@@ -39,34 +39,39 @@ var DEFAULT_RESIZE_TYPE = RESIZE_TYPE_FACTOR;
 var ImageTools = WinJS.Class.define(
     // Define the constructor function for the ColorsClass.
     function ImageTools(args) {
-        this._imageData = args["data"];
-        this._imageDataType = args["imageDataType"];
+        var options;
+        if (args && args.length === 1) {
+            options = args[0];
+        } else {
+            options = {};
+        }
+        this._imageData = options["data"];
+        this._imageDataType = options["imageDataType"];
         if (!this._imageDataType) {
             this._imageDataType = DEFAULT_IMAGE_DATA_TYPE;
         }
-        this._format = args["format"];
+        this._format = options["format"];
         if (!this._format) {
             this._format = DEFAULT_FORMAT;
         }
     }, {
-        imageData: {
-            get: function() {
-                return this._imageData;
-            }
-        },
-        imageDataType: {
-            get: function() {
-                return this._imageDataType;
-            }
-        },
-        format: {
-            get: function() {
-                return this._format;
-            }
-        },
         resizeImage: function(successCallback, errorCallback) {
         },
-        imageSize: function(successCallback, errorCallback) {
+        imageSize: function (successCallback, errorCallback) {
+            var that = this;
+            var ret = new WinJS.Promise.as().then(function() {
+                var img = new Image();
+                if (that._imageDataType === IMAGE_DATA_TYPE_BASE64) {
+                    img.src = "data:image/jpeg;base64," + that._imageData;
+                } else {
+                    img.src = that._imageData;
+                }
+                var width = img.width;
+                var height = img.height;
+                successCallback({ width: width, height: height });
+                return WinJS.Promise.as();
+            });
+            return ret;
         },
         storeImage: function(successCallback, errorCallback) {
         }

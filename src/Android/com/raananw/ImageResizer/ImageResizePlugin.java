@@ -1,13 +1,13 @@
 /**
  * An Image Resizer Plugin for Cordova/PhoneGap.
- * 
+ *
  * More Information : https://github.com/raananw/
- * 
+ *
  * The android version of the file stores the images using the local storage.
- * 
+ *
  * The software is open source, MIT Licensed.
  * Copyright (C) 2012, webXells GmbH All Rights Reserved.
- * 
+ *
  * @author Raanan Weber, webXells GmbH, http://www.webxells.com
  */
 package com.raananw;
@@ -72,14 +72,14 @@ public class ImageResizePlugin extends CordovaPlugin {
             return false;
         }
     }
-    
+
     private class ImageTools {
         protected JSONObject params;
         protected CallbackContext callbackContext;
         protected String format;
         protected String imageData;
         protected String imageDataType;
-        
+
         public ImageTools(JSONObject params, CallbackContext callbackContext) throws JSONException {
             this.params = params;
             this.callbackContext = callbackContext;
@@ -93,7 +93,7 @@ public class ImageResizePlugin extends CordovaPlugin {
                 format = params.getString("format");
             }
         }
-        
+
         protected Bitmap getBitmap(String imageData, String imageDataType, BitmapFactory.Options options) throws IOException, URISyntaxException {
             Bitmap bmp;
             if (imageDataType.equals(IMAGE_DATA_TYPE_BASE64)) {
@@ -106,13 +106,13 @@ public class ImageResizePlugin extends CordovaPlugin {
             }
             return bmp;
         }
-        
+
         private String getTempDirectoryPath() {
             // Use internal storage
             File cache = cordova.getActivity().getCacheDir();
             return cache.getAbsolutePath();
         }
-        
+
         protected void storeImage(JSONObject params, String format, Bitmap bmp, CallbackContext callbackContext) throws JSONException, IOException, URISyntaxException {
             int quality = params.getInt("quality");
             String filename = params.getString("filename");
@@ -137,18 +137,18 @@ public class ImageResizePlugin extends CordovaPlugin {
             outStream.flush();
             outStream.close();
             JSONObject res = new JSONObject();
-            res.put("filename", Uri.fromFile(file).toString());            
+            res.put("filename", Uri.fromFile(file).toString());
             res.put("width", bmp.getWidth());
             res.put("height", bmp.getHeight());
             callbackContext.success(res);
         }
     }
-    
+
     private class GetImageSize extends ImageTools implements Runnable {
         public GetImageSize(JSONObject params, CallbackContext callbackContext) throws JSONException {
             super(params, callbackContext);
         }
-        
+
         @Override
         public void run() {
             try {
@@ -170,12 +170,12 @@ public class ImageResizePlugin extends CordovaPlugin {
             }
         }
     }
-    
+
     private class StoreImage extends ImageTools implements Runnable {
         public StoreImage(JSONObject params, CallbackContext callbackContext) throws JSONException {
             super(params, callbackContext);
         }
-        
+
         @Override
         public void run() {
             try {
@@ -196,12 +196,12 @@ public class ImageResizePlugin extends CordovaPlugin {
             }
         }
     }
-    
+
     private class ResizeImage extends ImageTools implements Runnable {
         public ResizeImage(JSONObject params, CallbackContext callbackContext) throws JSONException {
             super(params, callbackContext);
         }
-        
+
         @Override
         public void run() {
             try {
@@ -212,29 +212,22 @@ public class ImageResizePlugin extends CordovaPlugin {
                 float reqWidth = options.outWidth * sizes[0];
                 float reqHeight = options.outHeight * sizes[1];
                 int inSampleSize = calculateInSampleSize(options, (int)reqWidth, (int)reqHeight);
-        
+
                 options = new BitmapFactory.Options();
                 options.inSampleSize = inSampleSize;
                 Bitmap bmp = getBitmap(imageData, imageDataType, options);
                 if (bmp == null) {
                     throw new IOException("The image file could not be opened.");
                 }
-                
+
                 sizes = calculateFactors(params, options.outWidth, options.outHeight);
-                File imageFile = null;
                 int orientation = ExifInterface.ORIENTATION_NORMAL;
                 URI uri = new URI(imageData);
-                if (uri) {
-                    imageFile = new File(uri);
-                    if (imageFile) {
-                        ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
-                        if (exif) {
-                            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                        }
-                    }
-                }
+                File imageFile = new File(uri);
+                ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                 bmp = getResizedBitmap(bmp, sizes[0], sizes[1], orientation);
-                        
+
                 if (params.getBoolean("storeImage")) {
                     storeImage(params, format, bmp, callbackContext);
                 } else {
@@ -265,7 +258,7 @@ public class ImageResizePlugin extends CordovaPlugin {
                 callbackContext.error(e.getMessage());
             }
         }
-        
+
         private Bitmap getResizedBitmap(Bitmap bm, float widthFactor, float heightFactor, int orientation) {
             int width = bm.getWidth();
             int height = bm.getHeight();
@@ -290,34 +283,34 @@ public class ImageResizePlugin extends CordovaPlugin {
             Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
             return resizedBitmap;
         }
-        
+
         private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
             // Raw height and width of image
             final int height = options.outHeight;
             final int width = options.outWidth;
             int inSampleSize = 1;
-        
+
             if (height > reqHeight || width > reqWidth) {
                 final int halfHeight = height / 2;
                 final int halfWidth = width / 2;
-        
+
                 // Calculate the largest inSampleSize value that is a power of 2 and keeps both
                 // height and width larger than the requested height and width.
                 while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
                     inSampleSize *= 2;
                 }
             }
-        
+
             return inSampleSize;
         }
-        
+
         private float[] calculateFactors(JSONObject params, int width, int height) throws JSONException {
             float widthFactor;
             float heightFactor;
             String resizeType = params.getString("resizeType");
             float desiredWidth = (float)params.getDouble("width");
             float desiredHeight = (float)params.getDouble("height");
-            
+
             if (resizeType.equals(RESIZE_TYPE_MIN_PIXEL)) {
                 widthFactor = desiredWidth / (float)width;
                 heightFactor = desiredHeight / (float)height;
@@ -345,7 +338,7 @@ public class ImageResizePlugin extends CordovaPlugin {
                 widthFactor = desiredWidth;
                 heightFactor = desiredHeight;
             }
-            
+
             if (params.getBoolean("pixelDensity")) {
                 DisplayMetrics metrics = cordova.getActivity().getResources().getDisplayMetrics();
                 if (metrics.density > 1) {
@@ -358,7 +351,7 @@ public class ImageResizePlugin extends CordovaPlugin {
                     }
                 }
             }
-            
+
             float[] sizes = {widthFactor, heightFactor};
             return sizes;
         }
