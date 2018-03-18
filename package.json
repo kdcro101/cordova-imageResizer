@@ -1,0 +1,19 @@
+{
+  "name": "cordova-imageresizer",
+  "version": "1.0.0",
+  "description": "This plugin resizes images natively using the phonegap / cordova architecture.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kdcro101/cordova-imageResizer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kdcro101/cordova-imageResizer/issues"
+  },
+  "homepage": "https://github.com/kdcro101/cordova-imageResizer#readme"
+}
